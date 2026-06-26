@@ -74,6 +74,8 @@ static const Layout layouts[] = {
 	{ MODKEY|ShiftMask,             KEY,      tag,            {.ui = 1 << TAG} }, \
 	{ MODKEY|ControlMask|ShiftMask, KEY,      toggletag,      {.ui = 1 << TAG} },
 
+#include <X11/XF86keysym.h>
+
 /* helper for spawning shell commands in the pre dwm-5.0 fashion */
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 
@@ -128,8 +130,15 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_period, focusmon,       {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
 	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
+
   { MODKEY|ShiftMask,             XK_s,      spawn,          {.v = screenshotcmd } }, /* screenshot keybind */
   { MODKEY|ShiftMask,             XK_n,      spawn,          {.v = changewallpapercmd } },
+
+  {0,                             XF86XK_AudioMute,             spawn,    CHCMD("pactl set-sink-mute 0 toggle") },
+  {0,                             XF86XK_AudioLowerVolume,      spawn,    CHCMD("pactl set-sink-volume 0 -5%") },
+  {0,                             XF86XK_AudioRaiseVolume,      spawn,    CHCMD("pactl set-sink-volume 0 +5%") },
+  {0,                             XF86XK_MonBrightnessUp,       spawn,    CHCMD("brightnessctl g +5%") },
+  {0,                             XF86XK_MonBrightnessDown,     spawn,    CHCMD("brightnessctl g 5%-") },
 
 	TAGKEYS(                        XK_1,                      0)
 	TAGKEYS(                        XK_2,                      1)
