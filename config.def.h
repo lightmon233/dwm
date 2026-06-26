@@ -134,9 +134,9 @@ static const Key keys[] = {
   { MODKEY|ShiftMask,             XK_s,      spawn,          {.v = screenshotcmd } }, /* screenshot keybind */
   { MODKEY|ShiftMask,             XK_n,      spawn,          {.v = changewallpapercmd } },
 
-  { 0,                             XF86XK_AudioMute,             spawn,    SHCMD("pactl set-sink-mute 0 toggle") },
-  { 0,                             XF86XK_AudioLowerVolume,      spawn,    SHCMD("pactl set-sink-volume 0 -5%") },
-  { 0,                             XF86XK_AudioRaiseVolume,      spawn,    SHCMD("pactl set-sink-volume 0 +5%") },
+  { 0,                             XF86XK_AudioMute,             spawn,    SHCMD("pamixer -t") },
+  { 0,                             XF86XK_AudioLowerVolume,      spawn,    SHCMD("pamixer -d 5") },
+  { 0,                             XF86XK_AudioRaiseVolume,      spawn,    SHCMD("pamixer -i 5") },
   { 0,                             XF86XK_MonBrightnessUp,       spawn,    SHCMD("brightnessctl g +5%") },
   { 0,                             XF86XK_MonBrightnessDown,     spawn,    SHCMD("brightnessctl g 5%-") },
 
