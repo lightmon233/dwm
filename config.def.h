@@ -32,7 +32,7 @@ static const Rule rules[] = {
 	 *	WM_NAME(STRING) = title
 	 */
 	/* class       instance    title       tags mask     isfloating   monitor */
-	{ "Alacritty", NULL,       NULL,       0,            1,           -1 },
+	{ "Alacritty", NULL,       NULL,       0,            0,           -1 },
 	{ "Firefox",   NULL,       NULL,       1 << 1,       0,           -1 },
 };
 
@@ -48,9 +48,10 @@ static const int refreshrate = 120;  /* refresh rate (per second) for client mov
 
 static const Layout layouts[] = {
 	/* symbol     arrange function */
-	{ "[M]",      monocle },  /* first entry is default */
-	{ "[]=",      tile },    
+  /* the first layout is the default */
 	{ "[@]",      spiral },
+	{ "[M]",      monocle },
+	{ "[]=",      tile },    
 	{ "[\\]",     dwindle },
 	{ "H[]",      deck },
 	{ "TTT",      bstack },
