@@ -751,6 +751,8 @@ drawbar(Monitor *m)
 	unsigned int i, occ = 0, urg = 0;
 	Client *c;
 
+  int gap = 50;
+
 	if (!m->showbar)
 		return;
 
@@ -795,8 +797,11 @@ drawbar(Monitor *m)
 	w = TEXTW(m->ltsymbol);
 	drw_setscheme(drw, scheme[SchemeNorm]);
 	x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0);
-
-	if ((w = m->ww - tw - x) > bh) {
+  // force to keep space when drawed layout symbols on the left
+  x += gap;
+  // recalculate usable space for middle title island, minus gap to its both sides
+  w = m->ww - tw - x - gap;
+	if (w > bh) {
 		if (m->sel) {
 			drw_setscheme(drw, scheme[m == selmon ? SchemeSel : SchemeNorm]);
 			drw_text(drw, x, 0, w, bh, lrpad / 2, m->sel->name, 0);
@@ -804,7 +809,8 @@ drawbar(Monitor *m)
 				drw_rect(drw, x + boxs, boxs, boxw, boxw, m->sel->isfixed, 0);
 		} else {
 			drw_setscheme(drw, scheme[SchemeNorm]);
-			drw_rect(drw, x, 0, w, bh, 1, 1);
+      // do not use drw_rect to colorize content, purly leaving gap space
+			// drw_rect(drw, x, 0, w, bh, 1, 1);
 		}
 	}
 	drw_map(drw, m->barwin, 0, 0, m->ww, bh);
