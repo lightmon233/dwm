@@ -137,8 +137,8 @@ static const Key keys[] = {
   { 0,                             XF86XK_AudioMute,             spawn,    SHCMD("pamixer -t") },
   { 0,                             XF86XK_AudioLowerVolume,      spawn,    SHCMD("pamixer -d 5") },
   { 0,                             XF86XK_AudioRaiseVolume,      spawn,    SHCMD("pamixer -i 5") },
-  { 0,                             XF86XK_MonBrightnessUp,       spawn,    SHCMD("brightnessctl g +5%") },
-  { 0,                             XF86XK_MonBrightnessDown,     spawn,    SHCMD("brightnessctl g 5%-") },
+  { 0,                             XF86XK_MonBrightnessUp,       spawn,    SHCMD("brightnessctl s +5%") },
+  { 0,                             XF86XK_MonBrightnessDown,     spawn,    SHCMD("brightnessctl s 5%-") },
 
 	TAGKEYS(                        XK_1,                      0)
 	TAGKEYS(                        XK_2,                      1)
