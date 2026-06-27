@@ -1913,8 +1913,7 @@ togglescratch(const Arg *arg)
     } else {
         /* 首次启动 */
         spawn(arg);
-        Arg current_tag = {.ui = selmon->tagset[selmon->seltags]};
-        view(&current_tag);
+        arrange(selmon);
     }
 }
 
