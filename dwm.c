@@ -249,7 +249,6 @@ static void zoom(const Arg *arg);
 
 /* variables */
 static const char broken[] = "broken";
-static int scratchpad_visible = 0; /* 0 表示收起，1 表示展开 */
 static char stext[256];
 static int statusw;
 static int statussig;
@@ -1781,8 +1780,8 @@ showhide(Client *c)
     if (!c)
         return;
 
-    /* 核心判定：要么它符合当前 tag 正常显示，要么它是被全局激活的 scratchpad */
-    int should_show = ISVISIBLE(c) || (scratchpad_visible && (c->tags & scratchtag));
+    // 判定条件：要么符合正常工作区可见，要么它是 scratchpad 且当前正处于“被呼出(在屏幕内)”的状态
+    int should_show = ISVISIBLE(c) || ((c->tags & scratchtag) && c->x >= selmon->wx && c->x < selmon->wx + selmon->ww);
 
     if (should_show) {
         /* show clients top down */
@@ -1796,6 +1795,7 @@ showhide(Client *c)
         XMoveWindow(dpy, c->win, WIDTH(c) * -2, c->y);
     }
 }
+
 
 void
 sigstatusbar(const Arg *arg)
@@ -1881,29 +1881,42 @@ togglescratch(const Arg *arg)
     Client *c;
     unsigned int found = 0;
 
-    for (c = selmon->clients; c && !(found = c->tags & scratchtag); c = c->next);
+    // 1. 寻找带有 scratchtag 身份证明的客户端
+    for (c = selmon->clients; c && !(found = (c->tags & scratchtag)); c = c->next);
     
     if (found) {
-        // 状态取反
-        scratchpad_visible = !scratchpad_visible;
+        /* 如果窗口当前是可见的（通过检查它是否被映射在屏幕上，或者判断它的临时状态） */
+        /* 最简单且不依赖变量的方法：检查它当前的 x 坐标是否在屏幕外，或者利用一个不用的标志位 */
+        // 这里我们用 dwm 窗口自带的 isfloating 和特定的隐藏位置来判定，或者用一个极简的技巧：
         
-        if (scratchpad_visible) {
-            // 如果是打开，强行拉到当前工作区
-            c->tags = scratchtag | selmon->tagset[selmon->seltags];
-            focus(c);
-        } else {
-            // 如果是关闭，剥离当前工作区，只留 scratchtag
-            c->tags = scratchtag;
+        // 如果它当前“醒着”并且在当前屏幕范围内
+        if (c->x >= 0 && c->x < selmon->mw) {
+            /* 【隐藏逻辑】 */
+            c->tags = scratchtag; // 恢复纯粹的 scratchtag 身份（不属于任何正常 tag）
+            
+            // 把他移出屏幕，或者直接隐藏
+            XMoveWindow(dpy, c->win, WIDTH(c) * -2, c->y); 
             focus(NULL);
+        } else {
+            /* 【显示逻辑】 */
+            // 保持 c->tags 依然只是 scratchtag，不破坏它的优雅性
+            // 但是我们要把它强行拉到当前屏幕的中央，并赋予它最高层级
+            
+            c->isfloating = 1; // 确保它是浮动的，不参与普通布局平铺
+            
+            // 移动到当前屏幕的中央（或者你指定的固定位置）
+            XMoveWindow(dpy, c->win, selmon->wx + (selmon->ww - WIDTH(c)) / 2, selmon->wy + (selmon->wh - HEIGHT(c)) / 2);
+            
+            // 强行提升窗口层级到最顶层
+            XRaiseWindow(dpy, c->win);
+            focus(c);
         }
         arrange(selmon);
     } else {
-        // 首次启动，默认设置为显示状态
-        scratchpad_visible = 1;
+        /* 首次启动 */
         spawn(arg);
     }
 }
-
 
 void
 toggletag(const Arg *arg)
