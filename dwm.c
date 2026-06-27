@@ -765,7 +765,7 @@ drawbar(Monitor *m)
 
   drw_setscheme(drw, scheme[SchemeNorm]);
 
-  XftColor trans_scheme[3];
+  XftColor trans_colors[3];
   trans_colors[ColFg] = drw->scheme[ColFg];
   trans_colors[ColBorder] = drw->scheme[ColBorder];
   trans_colors[ColBg] = drw->scheme[ColBg];
