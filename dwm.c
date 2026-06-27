@@ -821,7 +821,6 @@ drawbar(Monitor *m)
 		}
 	}
 	drw_map(drw, m->barwin, 0, 0, m->ww, bh);
-  XClearArea(dpy, m->barwin, x, 0, w, bh, False);
 }
 
 void
