@@ -763,23 +763,6 @@ drawbar(Monitor *m)
 	if (!m->showbar)
 		return;
 
-  drw_setscheme(drw, scheme[SchemeNorm]);
-
-  XftColor trans_colors[3];
-  trans_colors[ColFg] = drw->scheme[ColFg];
-  trans_colors[ColBorder] = drw->scheme[ColBorder];
-  trans_colors[ColBg] = drw->scheme[ColBg];
-  trans_colors[ColBg].color.alpha = 0x0000;
-  trans_colors[ColBg].color.red = 0x0000;
-  trans_colors[ColBg].color.green = 0x0000;
-  trans_colors[ColBg].color.blue = 0x0000;
-  XftColor *old_scheme = drw->scheme;
-  drw->scheme = trans_colors;
-
-	drw_rect(drw, x, 0, w, bh, 1, 1);
-
-  drw->scheme = old_scheme;
-
 	/* draw status first so it can be overdrawn by tags later */
 	if (m == selmon) { /* status is only drawn on selected monitor */
 		char *text, *s, ch;
@@ -832,12 +815,13 @@ drawbar(Monitor *m)
 			if (m->sel->isfloating)
 				drw_rect(drw, x + boxs, boxs, boxw, boxw, m->sel->isfixed, 0);
 		} else {
-			drw_setscheme(drw, scheme[SchemeNorm]);
-      // do not use drw_rect to colorize content, purly leaving gap space
+			// drw_setscheme(drw, scheme[SchemeNorm]);
 			// drw_rect(drw, x, 0, w, bh, 1, 1);
+      drw_clear(drw, x, 0, w, bh);
 		}
 	}
 	drw_map(drw, m->barwin, 0, 0, m->ww, bh);
+  XClearArea(dpy, m->barwin, x, 0, w, bh, False);
 }
 
 void

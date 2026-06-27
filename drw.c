@@ -407,6 +407,30 @@ no_match:
 }
 
 void
+drw_clear(Drw *drw, int x, int y, unsigned int w, unsigned int h)
+{
+  if (!drw)
+    return;
+
+  XRenderPictureAttributes pa;
+  pa.repeat = RepeatNone;
+
+  Picture picture = XRenderCreatePicture(
+      drw->dpy,
+      drw->drawable,
+      XRenderFindVisualFormat(drw->dpy, drw->visual),
+      CPRepeat,
+      &pa
+  );
+
+  XRenderColor xc = { .red = 0, .green = 0, .blue = 0, .alpha = 0 };
+
+  XRenderFillRectangle(drw->dpy, PictOpSrc, picture, &xc, x, y, w, h);
+
+  XRenderFreePicture(drw->dpy, picture);
+}
+
+void
 drw_map(Drw *drw, Window win, int x, int y, unsigned int w, unsigned int h)
 {
 	if (!drw)
