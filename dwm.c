@@ -764,7 +764,19 @@ drawbar(Monitor *m)
 		return;
 
   drw_setscheme(drw, scheme[SchemeNorm]);
-  XClearArea(dpy, m->barwin, 0, 0, m->ww, bh, False);
+
+  XftColor trans_scheme[3];
+  trans_scheme[ClrFg] = drw->scheme[SchemeNorm][ClrFg];
+  trans_scheme[ClrBorder] = drw->scheme[SchemeNorm][ClrBorder];
+  trans_scheme[ClrBg] = drw->scheme[SchemeNorm][ClrBg];
+  trans_scheme[ClrBg].color.alpha = 0x0000;
+  trans_scheme[ClrBg].color.red = 0x0000;
+  trans_scheme[ClrBg].color.green = 0x0000;
+  trans_scheme[ClrBg].color.blue = 0x0000;
+  XftColor *old_scheme = drw->scheme;
+  drw->scheme = trans_scheme;
+
+	drw_rect(drw, x, 0, w, bh, 1, 1);
 
 	/* draw status first so it can be overdrawn by tags later */
 	if (m == selmon) { /* status is only drawn on selected monitor */
