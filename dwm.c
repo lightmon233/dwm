@@ -249,6 +249,7 @@ static void zoom(const Arg *arg);
 
 /* variables */
 static const char broken[] = "broken";
+static int scratchpad_visible = 0; /* 0 表示收起，1 表示展开 */
 static char stext[256];
 static int statusw;
 static int statussig;
@@ -1780,11 +1781,10 @@ showhide(Client *c)
     if (!c)
         return;
 
-    /* 核心：如果这个窗口带有 scratchtag，且当前屏幕的标签组里也包含 scratchtag，说明它被手动打开了 */
-    int scratchpad_opened = (c->tags & scratchtag) && (selmon->tagset[selmon->seltags] & scratchtag);
+    /* 核心判定：要么它符合当前 tag 正常显示，要么它是被全局激活的 scratchpad */
+    int should_show = ISVISIBLE(c) || (scratchpad_visible && (c->tags & scratchtag));
 
-    /* 只要窗口本身可见，或者它是被打开的 scratchpad，就保持显示 */
-    if (ISVISIBLE(c) || scratchpad_opened) {
+    if (should_show) {
         /* show clients top down */
         XMoveWindow(dpy, c->win, c->x, c->y);
         if ((!c->mon->lt[c->mon->sellt]->arrange || c->isfloating) && !c->isfullscreen)
@@ -1878,24 +1878,32 @@ togglefloating(const Arg *arg)
 void
 togglescratch(const Arg *arg)
 {
-	Client *c;
-	unsigned int found = 0;
+    Client *c;
+    unsigned int found = 0;
 
-	for (c = selmon->clients; c && !(found = c->tags & scratchtag); c = c->next);
-	if (found) {
-		unsigned int newtagset = selmon->tagset[selmon->seltags] ^ scratchtag;
-		if (newtagset) {
-			selmon->tagset[selmon->seltags] = newtagset;
-			focus(NULL);
-			arrange(selmon);
-		}
-		if (ISVISIBLE(c)) {
-			focus(c);
-			restack(selmon);
-		}
-	} else
-		spawn(arg);
+    for (c = selmon->clients; c && !(found = c->tags & scratchtag); c = c->next);
+    
+    if (found) {
+        // 状态取反
+        scratchpad_visible = !scratchpad_visible;
+        
+        if (scratchpad_visible) {
+            // 如果是打开，强行拉到当前工作区
+            c->tags = scratchtag | selmon->tagset[selmon->seltags];
+            focus(c);
+        } else {
+            // 如果是关闭，剥离当前工作区，只留 scratchtag
+            c->tags = scratchtag;
+            focus(NULL);
+        }
+        arrange(selmon);
+    } else {
+        // 首次启动，默认设置为显示状态
+        scratchpad_visible = 1;
+        spawn(arg);
+    }
 }
+
 
 void
 toggletag(const Arg *arg)
