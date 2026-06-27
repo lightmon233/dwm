@@ -90,7 +90,7 @@ static const char *termcmd[]  = { "alacritty", NULL };
 static const char *screenshotcmd[] = { "sh", "-c", "mkdir -p ~/Screenshots && scrot -s ~/Screenshots/%Y-%m-%d_%H-%M-%S.png", NULL }; /* use scrot to do screenshots */
 static const char *changewallpapercmd[] = { "sh", "-c", "feh --bg-fill --randomize ~/Wallpapers", NULL };
 static const char scratchpadname[] = "scratchpad";
-static const char *scratchpadcmd[] = { "st", "-t", scratchpadname, "-g", "120x34", NULL };
+static const char *scratchpadcmd[] = { "alacritty", "-t", scratchpadname, "-g", "120x34", NULL };
 
 static const Key keys[] = {
 	/* modifier                     key        function        argument */
