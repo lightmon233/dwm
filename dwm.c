@@ -760,6 +760,8 @@ drawbar(Monitor *m)
 
   int gap = 50;
 
+  drw_setscheme(drw, scheme[SchemeNorm]);
+
 	if (!m->showbar)
 		return;
 
@@ -810,7 +812,8 @@ drawbar(Monitor *m)
   w = m->ww - tw - x - gap;
 	if (w > bh) {
 		if (m->sel) {
-      drw_setscheme(drw, scheme[SchemeNorm]);
+      XclearArea(dpy, m->barwin, x, 0, m->ww - x, bh, False);
+
 			drw_setscheme(drw, scheme[m == selmon ? SchemeSel : SchemeNorm]);
 			drw_text(drw, x, 0, w, bh, lrpad / 2, m->sel->name, 0);
 			if (m->sel->isfloating)
