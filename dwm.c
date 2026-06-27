@@ -765,9 +765,8 @@ drawbar(Monitor *m)
 	if (!m->showbar)
 		return;
 
-  /* 在绘制前，用标准背景色清空整条bar的pixmap缓冲区 */
   drw_setscheme(drw, scheme[SchemeNorm]);
-  drw_rect(drw, 0, 0, m->ww, bh, 1, 1);
+  XClearArea(dpy, m->barwin, 0, 0, m->ww, bh, False);
 
 	/* draw status first so it can be overdrawn by tags later */
 	if (m == selmon) { /* status is only drawn on selected monitor */
@@ -816,8 +815,6 @@ drawbar(Monitor *m)
   w = m->ww - tw - x - gap;
 	if (w > bh) {
 		if (m->sel) {
-      XClearArea(dpy, m->barwin, x, 0, m->ww - x, bh, False);
-
 			drw_setscheme(drw, scheme[m == selmon ? SchemeSel : SchemeNorm]);
 			drw_text(drw, x, 0, w, bh, lrpad / 2, m->sel->name, 0);
 			if (m->sel->isfloating)
