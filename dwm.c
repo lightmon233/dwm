@@ -815,18 +815,19 @@ drawbar(Monitor *m)
   x += gap;
   // recalculate usable space for middle title island, minus gap to its both sides
   w = m->ww - tw - x - gap;
-	if (w > bh) {
-		if (m->sel) {
-			drw_setscheme(drw, scheme[m == selmon ? SchemeSel : SchemeNorm]);
-			drw_text(drw, x, 0, w, bh, lrpad / 2, m->sel->name, 0);
-			if (m->sel->isfloating)
-				drw_rect(drw, x + boxs, boxs, boxw, boxw, m->sel->isfixed, 0);
-		} else {
-			// drw_setscheme(drw, scheme[SchemeNorm]);
-			// drw_rect(drw, x, 0, w, bh, 1, 1);
-      drw_clear(drw, x, 0, w, bh);
-		}
-	}
+  if (w > bh) {
+      /* 增加对 scratchpad 的判断 */
+      if (m->sel && !(m->sel->name && strstr(m->sel->name, "scratchpad"))) {
+          drw_setscheme(drw, scheme[m == selmon ? SchemeSel : SchemeNorm]);
+          drw_text(drw, x, 0, w, bh, lrpad / 2, m->sel->name, 0);
+          if (m->sel->isfloating)
+              drw_rect(drw, x + boxs, boxs, boxw, boxw, m->sel->isfixed, 0);
+      } else {
+          // 如果没有聚焦窗口，或者聚焦的是 scratchpad，就清空该区域
+          drw_clear(drw, x, 0, w, bh);
+      }
+  }
+
 	drw_map(drw, m->barwin, 0, 0, m->ww, bh);
 }
 
