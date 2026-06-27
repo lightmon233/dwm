@@ -1342,9 +1342,9 @@ propertynotify(XEvent *e)
 
 	if ((ev->window == root) && (ev->atom == XA_WM_NAME)) {
 		updatestatus();
-    Monitor *m;
-    for (m = mons; m; m = m->next)
-      drawbar(m);
+    // Monitor *m;
+    // for (m = mons; m; m = m->next)
+    //   drawbar(m);
   }
 	else if (ev->state == PropertyDelete)
 		return; /* ignore */
