@@ -806,13 +806,13 @@ drawbar(Monitor *m)
 	w = TEXTW(m->ltsymbol);
 	drw_setscheme(drw, scheme[SchemeNorm]);
 	x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0);
-  // force to keep space when drawed layout symbols on the left
+  // force to keep space after drawing layout symbols on the left
   x += gap;
   // recalculate usable space for middle title island, minus gap to its both sides
   w = m->ww - tw - x - gap;
 	if (w > bh) {
 		if (m->sel) {
-      XclearArea(dpy, m->barwin, x, 0, m->ww - x, bh, False);
+      XClearArea(dpy, m->barwin, x, 0, m->ww - x, bh, False);
 
 			drw_setscheme(drw, scheme[m == selmon ? SchemeSel : SchemeNorm]);
 			drw_text(drw, x, 0, w, bh, lrpad / 2, m->sel->name, 0);
