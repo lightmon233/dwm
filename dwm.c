@@ -1779,7 +1779,10 @@ showhide(Client *c)
 {
 	if (!c)
 		return;
-	if (ISVISIBLE(c)) {
+  
+  int scratchpad_visible = (c->tags & scratchtag) && (c->tags != scratchtag);
+
+	if (ISVISIBLE(c) || scratchpad_visible) {
 		/* show clients top down */
 		XMoveWindow(dpy, c->win, c->x, c->y);
 		if ((!c->mon->lt[c->mon->sellt]->arrange || c->isfloating) && !c->isfullscreen)
