@@ -760,8 +760,9 @@ drawbar(Monitor *m)
 
   int gap = 50;
 
-	if (!m->showbar)
-		return;
+	if (!m->showbar) return;
+
+  drw_clear(0, 0, w, bh);
 
 	/* draw status first so it can be overdrawn by tags later */
 	if (m == selmon) { /* status is only drawn on selected monitor */
