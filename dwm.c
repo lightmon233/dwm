@@ -766,15 +766,15 @@ drawbar(Monitor *m)
   drw_setscheme(drw, scheme[SchemeNorm]);
 
   XftColor trans_scheme[3];
-  trans_scheme[ColFg] = drw->scheme[SchemeNorm][ColFg];
-  trans_scheme[ColBorder] = drw->scheme[SchemeNorm][ColBorder];
-  trans_scheme[ColBg] = drw->scheme[SchemeNorm][ColBg];
-  trans_scheme[ColBg].color.alpha = 0x0000;
-  trans_scheme[ColBg].color.red = 0x0000;
-  trans_scheme[ColBg].color.green = 0x0000;
-  trans_scheme[ColBg].color.blue = 0x0000;
+  trans_colors[ColFg] = drw->scheme[ColFg];
+  trans_colors[ColBorder] = drw->scheme[ColBorder];
+  trans_colors[ColBg] = drw->scheme[ColBg];
+  trans_colors[ColBg].color.alpha = 0x0000;
+  trans_colors[ColBg].color.red = 0x0000;
+  trans_colors[ColBg].color.green = 0x0000;
+  trans_colors[ColBg].color.blue = 0x0000;
   XftColor *old_scheme = drw->scheme;
-  drw->scheme = trans_scheme;
+  drw->scheme = trans_colors;
 
 	drw_rect(drw, x, 0, w, bh, 1, 1);
 
