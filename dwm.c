@@ -766,17 +766,19 @@ drawbar(Monitor *m)
   drw_setscheme(drw, scheme[SchemeNorm]);
 
   XftColor trans_scheme[3];
-  trans_scheme[ClrFg] = drw->scheme[SchemeNorm][ClrFg];
-  trans_scheme[ClrBorder] = drw->scheme[SchemeNorm][ClrBorder];
-  trans_scheme[ClrBg] = drw->scheme[SchemeNorm][ClrBg];
-  trans_scheme[ClrBg].color.alpha = 0x0000;
-  trans_scheme[ClrBg].color.red = 0x0000;
-  trans_scheme[ClrBg].color.green = 0x0000;
-  trans_scheme[ClrBg].color.blue = 0x0000;
+  trans_scheme[ColFg] = drw->scheme[SchemeNorm][ColFg];
+  trans_scheme[ColBorder] = drw->scheme[SchemeNorm][ColBorder];
+  trans_scheme[ColBg] = drw->scheme[SchemeNorm][ColBg];
+  trans_scheme[ColBg].color.alpha = 0x0000;
+  trans_scheme[ColBg].color.red = 0x0000;
+  trans_scheme[ColBg].color.green = 0x0000;
+  trans_scheme[ColBg].color.blue = 0x0000;
   XftColor *old_scheme = drw->scheme;
   drw->scheme = trans_scheme;
 
 	drw_rect(drw, x, 0, w, bh, 1, 1);
+
+  drw->scheme = old_scheme;
 
 	/* draw status first so it can be overdrawn by tags later */
 	if (m == selmon) { /* status is only drawn on selected monitor */
