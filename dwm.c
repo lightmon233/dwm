@@ -762,7 +762,7 @@ drawbar(Monitor *m)
 
 	if (!m->showbar) return;
 
-  drw_clear(0, 0, w, bh);
+  drw_clear(drw, 0, 0, w, bh);
 
 	/* draw status first so it can be overdrawn by tags later */
 	if (m == selmon) { /* status is only drawn on selected monitor */
