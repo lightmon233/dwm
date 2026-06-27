@@ -760,8 +760,6 @@ drawbar(Monitor *m)
 
   int gap = 50;
 
-  drw_setscheme(drw, scheme[SchemeNorm]);
-
 	if (!m->showbar)
 		return;
 
