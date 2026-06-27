@@ -50,7 +50,9 @@
 #define INTERSECT(x,y,w,h,m)    (MAX(0, MIN((x)+(w),(m)->wx+(m)->ww) - MAX((x),(m)->wx)) \
                                * MAX(0, MIN((y)+(h),(m)->wy+(m)->wh) - MAX((y),(m)->wy)))
 #define ISVISIBLEONTAG(C, T)    ((C->tags & T))
-#define ISVISIBLE(C)            ISVISIBLEONTAG(C, C->mon->tagset[C->mon->seltags])
+// #define ISVISIBLE(C)            ISVISIBLEONTAG(C, C->mon->tagset[C->mon->seltags])
+#define ISVISIBLE(C)            ((C->tags & C->mon->tagset[C->mon->seltags]) || \
+                                 ((C->tags & scratchtag) && C->x >= C->mon->wx && C->x < C->mon->wx + C->mon->ww))
 #define MOUSEMASK               (BUTTONMASK|PointerMotionMask)
 #define WIDTH(X)                ((X)->w + 2 * (X)->bw)
 #define HEIGHT(X)               ((X)->h + 2 * (X)->bw)
@@ -1780,10 +1782,8 @@ showhide(Client *c)
     if (!c)
         return;
 
-    // 判定条件：要么符合正常工作区可见，要么它是 scratchpad 且当前正处于“被呼出(在屏幕内)”的状态
-    int should_show = ISVISIBLE(c) || ((c->tags & scratchtag) && c->x >= selmon->wx && c->x < selmon->wx + selmon->ww);
-
-    if (should_show) {
+    // 借助我们修改后的 ISVISIBLE 宏，它能自动识别 1-9 正常窗口 以及 处于屏幕内的 Scratchpad
+    if (ISVISIBLE(c)) {
         /* show clients top down */
         XMoveWindow(dpy, c->win, c->x, c->y);
         if ((!c->mon->lt[c->mon->sellt]->arrange || c->isfloating) && !c->isfullscreen)
@@ -1792,10 +1792,10 @@ showhide(Client *c)
     } else {
         /* hide clients bottom up */
         showhide(c->snext);
+        // 如果是隐藏状态，确保它呆在屏幕外
         XMoveWindow(dpy, c->win, WIDTH(c) * -2, c->y);
     }
 }
-
 
 void
 sigstatusbar(const Arg *arg)
@@ -1881,36 +1881,33 @@ togglescratch(const Arg *arg)
     Client *c;
     unsigned int found = 0;
 
-    // 1. 寻找带有 scratchtag 身份证明的客户端
+    // 1. 在当前显示器寻找带有 scratchtag 身份的客户端
     for (c = selmon->clients; c && !(found = (c->tags & scratchtag)); c = c->next);
     
     if (found) {
-        /* 如果窗口当前是可见的（通过检查它是否被映射在屏幕上，或者判断它的临时状态） */
-        /* 最简单且不依赖变量的方法：检查它当前的 x 坐标是否在屏幕外，或者利用一个不用的标志位 */
-        // 这里我们用 dwm 窗口自带的 isfloating 和特定的隐藏位置来判定，或者用一个极简的技巧：
-        
-        // 如果它当前“醒着”并且在当前屏幕范围内
-        if (c->x >= 0 && c->x < selmon->mw) {
+        // 判断条件：如果当前 x 坐标在屏幕可视范围内，说明它正开着
+        if (c->x >= selmon->wx && c->x < selmon->wx + selmon->mw) {
             /* 【隐藏逻辑】 */
-            c->tags = scratchtag; // 恢复纯粹的 scratchtag 身份（不属于任何正常 tag）
-            
-            // 把他移出屏幕，或者直接隐藏
-            XMoveWindow(dpy, c->win, WIDTH(c) * -2, c->y); 
+            // 移出屏幕（这里我们把它藏到极远的负坐标，同时保留它原本的宽度，不要破坏 c->x）
+            // 为了防止 showhide 把它拉回来，我们先手动移走它
+            XMoveWindow(dpy, c->win, WIDTH(c) * -2, c->y);
+            // 临时把它的坐标改到屏幕外，让接下来的 arrange() 和 showhide() 知道它已经被隐藏了
+            c->x = WIDTH(c) * -2; 
             focus(NULL);
         } else {
             /* 【显示逻辑】 */
-            // 保持 c->tags 依然只是 scratchtag，不破坏它的优雅性
-            // 但是我们要把它强行拉到当前屏幕的中央，并赋予它最高层级
+            c->isfloating = 1; // 确保是浮动状态
             
-            c->isfloating = 1; // 确保它是浮动的，不参与普通布局平铺
+            // 计算居中坐标，并直接赋值给窗口结构体
+            c->x = selmon->wx + (selmon->ww - WIDTH(c)) / 2;
+            c->y = selmon->wy + (selmon->wh - HEIGHT(c)) / 2;
             
-            // 移动到当前屏幕的中央（或者你指定的固定位置）
-            XMoveWindow(dpy, c->win, selmon->wx + (selmon->ww - WIDTH(c)) / 2, selmon->wy + (selmon->wh - HEIGHT(c)) / 2);
-            
-            // 强行提升窗口层级到最顶层
+            // 先物理移动并提到最顶层
+            XMoveWindow(dpy, c->win, c->x, c->y);
             XRaiseWindow(dpy, c->win);
             focus(c);
         }
+        // 重新刷新布局（由于我们改了 ISVISIBLE 宏，arrange 会完美处理它的显隐）
         arrange(selmon);
     } else {
         /* 首次启动 */
