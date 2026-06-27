@@ -810,13 +810,6 @@ drawbar(Monitor *m)
   w = m->ww - tw - x - gap;
 	if (w > bh) {
 		if (m->sel) {
-      // fix status bar repainting issue(overridding gap on its left)
-      // force to clear title bar and status bar space, to avoid remaining pixels from the last frame
-      // since alpha patch is merged in, SchemeNorm would be transparent
-      drw_setscheme(drw, scheme[SchemeNorm]);
-      // drw_rect(drw, x, 0, w + gap, bh, 1, 1);
-      
-      // after clear, draw title bar in reduced w range
 			drw_setscheme(drw, scheme[m == selmon ? SchemeSel : SchemeNorm]);
 			drw_text(drw, x, 0, w, bh, lrpad / 2, m->sel->name, 0);
 			if (m->sel->isfloating)
@@ -1343,8 +1336,12 @@ propertynotify(XEvent *e)
 	Window trans;
 	XPropertyEvent *ev = &e->xproperty;
 
-	if ((ev->window == root) && (ev->atom == XA_WM_NAME))
+	if ((ev->window == root) && (ev->atom == XA_WM_NAME)) {
 		updatestatus();
+    Monitor *m;
+    for (m = mons; m; m = m->next)
+      drawbar(m);
+  }
 	else if (ev->state == PropertyDelete)
 		return; /* ignore */
 	else if ((c = wintoclient(ev->window))) {
