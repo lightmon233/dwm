@@ -1777,22 +1777,24 @@ seturgent(Client *c, int urg)
 void
 showhide(Client *c)
 {
-	if (!c)
-		return;
-  
-  int scratchpad_visible = (c->tags & scratchtag) && (c->tags != scratchtag);
+    if (!c)
+        return;
 
-	if (ISVISIBLE(c) || scratchpad_visible) {
-		/* show clients top down */
-		XMoveWindow(dpy, c->win, c->x, c->y);
-		if ((!c->mon->lt[c->mon->sellt]->arrange || c->isfloating) && !c->isfullscreen)
-			resize(c, c->x, c->y, c->w, c->h, 0);
-		showhide(c->snext);
-	} else {
-		/* hide clients bottom up */
-		showhide(c->snext);
-		XMoveWindow(dpy, c->win, WIDTH(c) * -2, c->y);
-	}
+    /* 核心：如果这个窗口带有 scratchtag，且当前屏幕的标签组里也包含 scratchtag，说明它被手动打开了 */
+    int scratchpad_opened = (c->tags & scratchtag) && (selmon->tagset[selmon->seltags] & scratchtag);
+
+    /* 只要窗口本身可见，或者它是被打开的 scratchpad，就保持显示 */
+    if (ISVISIBLE(c) || scratchpad_opened) {
+        /* show clients top down */
+        XMoveWindow(dpy, c->win, c->x, c->y);
+        if ((!c->mon->lt[c->mon->sellt]->arrange || c->isfloating) && !c->isfullscreen)
+            resize(c, c->x, c->y, c->w, c->h, 0);
+        showhide(c->snext);
+    } else {
+        /* hide clients bottom up */
+        showhide(c->snext);
+        XMoveWindow(dpy, c->win, WIDTH(c) * -2, c->y);
+    }
 }
 
 void
