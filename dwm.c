@@ -765,6 +765,10 @@ drawbar(Monitor *m)
 	if (!m->showbar)
 		return;
 
+  /* 在绘制前，用标准背景色清空整条bar的pixmap缓冲区 */
+  drw_setscheme(drw, scheme[SchemeNorm]);
+  drw_rect(drw, 0, 0, m->ww, bh, 1, 1);
+
 	/* draw status first so it can be overdrawn by tags later */
 	if (m == selmon) { /* status is only drawn on selected monitor */
 		char *text, *s, ch;
