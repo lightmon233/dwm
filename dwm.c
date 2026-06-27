@@ -810,6 +810,7 @@ drawbar(Monitor *m)
   w = m->ww - tw - x - gap;
 	if (w > bh) {
 		if (m->sel) {
+      drw_setscheme(drw, scheme[SchemeNorm]);
 			drw_setscheme(drw, scheme[m == selmon ? SchemeSel : SchemeNorm]);
 			drw_text(drw, x, 0, w, bh, lrpad / 2, m->sel->name, 0);
 			if (m->sel->isfloating)
