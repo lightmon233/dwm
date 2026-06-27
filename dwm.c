@@ -1203,6 +1203,20 @@ manage(Window w, XWindowAttributes *wa)
 	arrange(c->mon);
 	XMapWindow(dpy, c->win);
 	focus(NULL);
+    // ================== 你的专用 Hack 黑魔法 ==================
+  if (c && (c->tags & scratchtag)) {
+      // 1. 强制将 scratchpad 的物理坐标在 X 轴上重置回居中位置，消除 XMoveResizeWindow 的负面影响
+      c->x = c->mon->wx + (c->mon->ww - WIDTH(c)) / 2;
+      XMoveWindow(dpy, c->win, c->x, c->y);
+      
+      // 2. 核心 Hack：利用 view 机制自动刷新当前工作区
+      Arg a = {.ui = selmon->tagset[selmon->seltags]};
+      view(&a); 
+      
+      // 3. 重新让它获得焦点，确保第一次出来就是激活状态
+      focus(c); 
+  }
+  // =========================================================
 }
 
 void
