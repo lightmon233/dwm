@@ -92,11 +92,11 @@ static const char *termcmd[]  = { "alacritty", NULL };
 static const char *screenshotcmd[] = { "sh", "-c", "mkdir -p ~/Screenshots && scrot -s ~/Screenshots/%Y-%m-%d_%H-%M-%S.png", NULL }; /* use scrot to do screenshots */
 static const char *changewallpapercmd[] = { "sh", "-c", "feh --bg-fill --randomize ~/Wallpapers", NULL };
 static const char scratchpadname[] = "scratchpad";
-	{ MODKEY,                       XK_F5,     xrdb,           {.v = NULL } },
 static const char *scratchpadcmd[] = { "alacritty", "--title", scratchpadname, "--class", "scratchpad", NULL };
 
 static const Key keys[] = {
 	/* modifier                     key        function        argument */
+	{ MODKEY,                       XK_F5,     xrdb,           {.v = NULL } },
 	{ MODKEY,                       XK_r,      spawn,          {.v = dmenucmd } },
 	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },
 	{ MODKEY,                       XK_p,      togglescratch,  {.v = scratchpadcmd } },
