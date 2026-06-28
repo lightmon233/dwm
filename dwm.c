@@ -2433,9 +2433,10 @@ void
 xrdb(const Arg *arg)
 {
   loadxrdb();
+	unsigned int alphas[] = {borderalpha, baralpha, OPAQUE};
   int i;
   for (i = 0; i < LENGTH(colors); i++)
-                scheme[i] = drw_scm_create(drw, colors[i], 3);
+                scheme[i] = drw_scm_create(drw, colors[i], alphas, 3);
   focus(NULL);
   arrange(NULL);
 }
